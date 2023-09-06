@@ -23,6 +23,7 @@ class Product(models.Model):
 class Category(models.Model):
     name = models.CharField(max_length=50, verbose_name='Наименование')
     about = models.TextField(verbose_name='Описание')
+    created_at = models.TextField(verbose_name='тестируем умения')
 
     def __str__(self):
         return f"{self.name} {self.about}"
