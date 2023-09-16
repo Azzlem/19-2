@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
 from django.utils.text import slugify
-from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 from catalog.models import Product, Article
 
@@ -60,6 +60,13 @@ class ArticleUpdateView(UpdateView):
 
     def get_success_url(self):
         return reverse('catalog:article', args=[self.kwargs.get('pk')])
+
+
+class ArticleDeleteView(DeleteView):
+    model = Article
+
+    def get_success_url(self):
+        return reverse('catalog:article_list')
 
 
 def contact(request):
