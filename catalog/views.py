@@ -1,21 +1,65 @@
 from django.shortcuts import render
+from django.urls import reverse_lazy, reverse
+from django.utils.text import slugify
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
 
-from catalog.models import Product
+from catalog.models import Product, Article
 
 
-def index(request):
-    if request.method == "POST":
-        name = request.POST.get('name')
-        email = request.POST.get('email')
-        print(name, email)
+class IndexListView(ListView):
+    model = Product
+    template_name = 'catalog/index.html'
 
-    beer_list = Product.objects.all()
 
-    context = {
-        'object_list': beer_list
-    }
+class ProductDetailView(DetailView):
+    model = Product
+    template_name = 'catalog/product.html'
 
-    return render(request, 'catalog/index.html', context)
+
+class ArticleListView(ListView):
+    model = Article
+
+
+class ArticleDetailView(DetailView):
+    model = Article
+
+    def get_object(self, queryset=None):
+        self.object = super().get_object(queryset)
+        self.object.views_count += 1
+        self.object.save()
+        return self.object
+
+
+class ArticleCreateView(CreateView):
+    model = Article
+    fields = ('title', 'about', 'image',)
+
+    def form_valid(self, form):
+        if form.is_valid():
+            new_content = form.save()
+            new_content.slug = slugify(new_content.title)
+            new_content.save()
+
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('catalog:article_list')
+
+
+class ArticleUpdateView(UpdateView):
+    model = Article
+    fields = ('title', 'about', 'image',)
+
+    def form_valid(self, form):
+        if form.is_valid():
+            new_content = form.save()
+            new_content.slug = slugify(new_content.title)
+            new_content.save()
+
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('catalog:article', args=[self.kwargs.get('pk')])
 
 
 def contact(request):
@@ -25,13 +69,3 @@ def contact(request):
         print(name, email)
 
     return render(request, 'catalog/contact.html')
-
-
-def product(request, pk):
-    info = Product.objects.get(pk=pk)
-
-    context = {
-        'object_list': Product.objects.get(pk=pk),
-        'name': f'{info.about}',
-    }
-    return render(request, 'catalog/product.html', context)

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db import models
 
 NULLABLE = {'blank': True, 'null': True}
@@ -30,4 +32,25 @@ class Category(models.Model):
     class Meta:
         verbose_name = "Категория"
         verbose_name_plural = "Категории"
+
+
+class Article(models.Model):
+    title = models.CharField(max_length=150, verbose_name='Заголовок')
+    image = models.ImageField(upload_to='media/', verbose_name='Превью', **NULLABLE)
+    about = models.TextField(verbose_name='содержимое')
+    created_at = models.DateTimeField(default=datetime.now, verbose_name='Дата создания')
+    published = models.BooleanField(default=True, verbose_name='опубликовано')
+    slug = models.CharField(max_length=30, verbose_name='slug', **NULLABLE)
+    views_count = models.IntegerField(default=0, verbose_name='просмотры')
+
+    def __str__(self):
+        return f'{self.title} {self.created_at}'
+
+    class Meta:
+        verbose_name = 'статья'
+        verbose_name_plural = 'статьи'
+
+
+
+
 
